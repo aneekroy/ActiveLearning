@@ -1,0 +1,13 @@
+model_name: bert-base-uncased
+al_method: random
+num_shots: 8
+pool_fraction: 0.2
+classification_tasks: ["sst2"]
+multichoice_tasks: ["hellaswag"]
+data_dir: data
+standardized_dir: data/standardized
+raw_dir: data/raw
+outputs_dir: outputs
+max_seq_length: 128
+seed: 42
+device: cpu

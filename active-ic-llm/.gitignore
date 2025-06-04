@@ -1,0 +1,6 @@
+# Ignore data and output directories
+venv/
+__pycache__/
+.data/
+data/
+outputs/
