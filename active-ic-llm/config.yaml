@@ -2,8 +2,11 @@ model_name: bert-base-uncased
 al_method: random
 num_shots: 8
 pool_fraction: 0.2
-classification_tasks: ["sst2"]
-multichoice_tasks: ["hellaswag"]
+classification_tasks: ["sst2", "boolq"]
+multichoice_tasks: ["hellaswag", "arc-c", "arc-e", "winogrande", "piqa", "siqa", "obqa"]
+commonsense_tasks: ["hellaswag", "arc-c", "arc-e", "winogrande", "piqa", "siqa", "obqa"]
+math_reasoning_tasks: ["gsm8k", "aqua_rat", "addsub", "multiarith", "singleeq", "svamp"]
+instruction_following_tasks: ["dolly_eval", "vicuna_eval", "self_instruct", "s_ni", "un_ni"]
 data_dir: data
 standardized_dir: data/standardized
 raw_dir: data/raw

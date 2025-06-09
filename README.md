@@ -8,3 +8,7 @@ See `active-ic-llm/README.md` for details on how to install dependencies, prepar
 
 The codebase optionally integrates the [unsloth.ai](https://www.unsloth.ai) library
 for faster model loading when the `--use_unsloth` flag is supplied.
+
+Prepared datasets span multiple benchmarks including math reasoning
+(e.g. GSM8k, AQUA-RAT), commonsense QA (BoolQ, HellaSwag, ARC, Winogrande, PiQA
+and others) and instruction following evaluations such as DollyEval and VicunaEval.

@@ -5,4 +5,4 @@ datasets
 scikit-learn
 pyyaml
 pandas
-unsloth
+unsloth  # optional speedups

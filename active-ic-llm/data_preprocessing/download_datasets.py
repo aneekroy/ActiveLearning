@@ -8,9 +8,33 @@ from pathlib import Path
 CATEGORIES = {
     "classification": [
         "sst2",
+        # Commonsense QA style binary classification
+        "boolq",
     ],
     "multichoice": [
         "hellaswag",
+        "arc-c",
+        "arc-e",
+        "winogrande",
+        "piqa",
+        "siqa",
+        "obqa",
+    ],
+    # Additional categories used for experimentation
+    "math_reasoning": [
+        "gsm8k",
+        "aqua_rat",
+        "addsub",
+        "multiarith",
+        "singleeq",
+        "svamp",
+    ],
+    "instruction_following": [
+        "dolly_eval",
+        "vicuna_eval",
+        "self_instruct",
+        "s_ni",
+        "un_ni",
     ],
 }
 
