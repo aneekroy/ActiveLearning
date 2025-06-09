@@ -33,3 +33,20 @@ python src/run_experiment.py --task sst2 --al_method random --model_name bert-ba
 
 Batch experiments for all tasks are available under `experiments/`.
 Outputs including per-example predictions and accuracy/F1 scores are written to the `outputs/` directory. The metrics file for a run can be found at `outputs/<task_type>/<task>/<model>/<al_method>/metrics.json`.
+To average metrics across multiple runs you can use `../scripts/aggregate_metrics.py`.
+
+### Llama-3.2 training examples
+
+The commands below illustrate how to run `run_experiment.py` with the 1B and 3B Llama-3.2 models on three math reasoning tasks:
+
+```bash
+# 1B model
+python src/run_experiment.py --task gsm8k --al_method random --model_name llama-3.2-1b --num_shots 8
+python src/run_experiment.py --task MultiArith --al_method random --model_name llama-3.2-1b --num_shots 8
+python src/run_experiment.py --task AddSub --al_method random --model_name llama-3.2-1b --num_shots 8
+
+# 3B model
+python src/run_experiment.py --task gsm8k --al_method random --model_name llama-3.2-3b --num_shots 8
+python src/run_experiment.py --task MultiArith --al_method random --model_name llama-3.2-3b --num_shots 8
+python src/run_experiment.py --task AddSub --al_method random --model_name llama-3.2-3b --num_shots 8
+```
