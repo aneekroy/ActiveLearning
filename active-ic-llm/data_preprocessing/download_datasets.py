@@ -8,33 +8,31 @@ from pathlib import Path
 CATEGORIES = {
     "classification": [
         "sst2",
-        # Commonsense QA style binary classification
         "boolq",
     ],
     "multichoice": [
         "hellaswag",
-        "arc-c",
-        "arc-e",
-        "winogrande",
+        ("allenai/ai2_arc", "ARC-Challenge"),  # specify config explicitly
+        ("allenai/ai2_arc", "ARC-Easy"),
+        ("winogrande", "winogrande_xl"),  # choose appropriate config
         "piqa",
-        "siqa",
-        "obqa",
+        "social_i_qa",  # corrected 'siqa' to 'social_i_qa'
+        "openbookqa",   # corrected 'obqa' to 'openbookqa'
     ],
-    # Additional categories used for experimentation
     "math_reasoning": [
-        "gsm8k",
+        ("gsm8k", "main"),       # specify config explicitly
         "aqua_rat",
-        "addsub",
-        "multiarith",
-        "singleeq",
-        "svamp",
+        "AddSub",                # corrected 'addsub' to 'AddSub'
+        "MultiArith",            # corrected 'multiarith' to 'MultiArith'
+        "SingleEq",              # corrected 'singleeq' to 'SingleEq'
+        "SVAMP",                 # corrected 'svamp' to 'SVAMP'
     ],
     "instruction_following": [
-        "dolly_eval",
-        "vicuna_eval",
-        "self_instruct",
-        "s_ni",
-        "un_ni",
+        "databricks/databricks-dolly-15k",  # corrected 'dolly_eval'
+        "lmsys/vicuna-eval",                # corrected 'vicuna_eval'
+        "yizhongw/self_instruct",           # corrected 'self_instruct'
+        "super_ni",                         # corrected 's_ni'
+        "ultrachat",                        # corrected 'un_ni'
     ],
 }
 
@@ -45,10 +43,26 @@ def save_split(ds_split, out_path: Path) -> None:
     ds_split.to_json(str(out_path))
 
 
+def is_dataset_downloaded(task_name, out_dir):
+    """Check if at least one split file exists for the dataset."""
+    dataset_dir = Path(out_dir) / task_name
+    if not dataset_dir.exists():
+        return False
+    # Check for at least one .jsonl file (split)
+    return any(dataset_dir.glob("*.jsonl"))
+
+
 def download_task(task_name, out_dir):
-    ds = load_dataset(task_name)
-    for split, dset in ds.items():
-        save_split(dset, Path(out_dir) / task_name / f"{split}.jsonl")
+    if is_dataset_downloaded(task_name, out_dir):
+        print(f"Skipping {task_name}: already downloaded.")
+        return
+    try:
+        ds = load_dataset(task_name)
+        for split, dset in ds.items():
+            save_split(dset, Path(out_dir) / task_name / f"{split}.jsonl")
+        print(f"Downloaded {task_name} successfully.")
+    except Exception as e:
+        print(f"Failed to download {task_name}: {e}")
 
 
 def main():
