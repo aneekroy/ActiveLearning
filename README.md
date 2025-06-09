@@ -12,3 +12,11 @@ for faster model loading when the `--use_unsloth` flag is supplied.
 Prepared datasets span multiple benchmarks including math reasoning
 (e.g. GSM8k, AQUA-RAT), commonsense QA (BoolQ, HellaSwag, ARC, Winogrande, PiQA
 and others) and instruction following evaluations such as DollyEval and VicunaEval.
+
+## Aggregating Results
+
+Use `scripts/aggregate_metrics.py` to compute the average accuracy and F1 across multiple runs. It expects the default metrics produced by `run_experiment.py` and writes the aggregated values next to them.
+
+```bash
+python scripts/aggregate_metrics.py --task <task> --model <model_name> --al_method <strategy>
+```

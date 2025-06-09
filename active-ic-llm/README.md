@@ -33,3 +33,4 @@ python src/run_experiment.py --task sst2 --al_method random --model_name bert-ba
 
 Batch experiments for all tasks are available under `experiments/`.
 Outputs including per-example predictions and accuracy/F1 scores are written to the `outputs/` directory. The metrics file for a run can be found at `outputs/<task_type>/<task>/<model>/<al_method>/metrics.json`.
+To average metrics across multiple runs you can use `../scripts/aggregate_metrics.py`.
