@@ -24,3 +24,7 @@ python scripts/aggregate_metrics.py --task <task> --model <model_name> --al_meth
 ## Step-by-Step Walkthrough
 
 A concise walkthrough covering setup, dataset preparation and running a sample experiment is provided in [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md).
+
+### Example: training Llama-3.2 on math tasks
+
+See [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md#6-training-llama-3-2-models-on-math-benchmarks) for commands that fine-tune the 1B and 3B Llama-3.2 models on GSM8k, MultiArith and AddSub.
