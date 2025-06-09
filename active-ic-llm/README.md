@@ -12,6 +12,9 @@ This directory contains the implementation of ActiveLLM. It is organised into se
 ```bash
 pip install -r requirements.txt
 ```
+To enable optional training and inference optimisations using
+[unsloth.ai](https://www.unsloth.ai), install the extra dependency and pass the
+`--use_unsloth` flag when running experiments.
 
 ## Preparing Data
 

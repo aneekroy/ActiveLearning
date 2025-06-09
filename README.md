@@ -5,3 +5,6 @@ This repository provides an implementation of **ActiveLLM**, a large language mo
 The code is organised as a Python package under `active-ic-llm` and contains scripts for dataset preparation, running experiments with different active learning strategies and models, and utilities for embeddings and clustering.
 
 See `active-ic-llm/README.md` for details on how to install dependencies, prepare data and reproduce the experiments.
+
+The codebase optionally integrates the [unsloth.ai](https://www.unsloth.ai) library
+for faster model loading when the `--use_unsloth` flag is supplied.

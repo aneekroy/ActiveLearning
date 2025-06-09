@@ -11,3 +11,4 @@ outputs_dir: outputs
 max_seq_length: 128
 seed: 42
 device: cpu
+use_unsloth: false
