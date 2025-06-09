@@ -20,3 +20,7 @@ Use `scripts/aggregate_metrics.py` to compute the average accuracy and F1 across
 ```bash
 python scripts/aggregate_metrics.py --task <task> --model <model_name> --al_method <strategy>
 ```
+
+## Step-by-Step Walkthrough
+
+A concise walkthrough covering setup, dataset preparation and running a sample experiment is provided in [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md).
