@@ -17,7 +17,7 @@ def prepare_classification(records) -> pd.DataFrame:
         {
             "id": range(len(records)),
             "text": [r.get("text", r.get("question", "")) for r in records],
-            "label": [r.get("label") for r in records],
+            "label": [r.get("label", r.get("answer")) for r in records],
         }
     )
 

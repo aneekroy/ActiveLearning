@@ -2,7 +2,7 @@
 
 This directory contains the implementation of ActiveLLM. It is organised into several modules:
 
-- `data_preprocessing/` — scripts for downloading and preparing CrossFit datasets.
+- `data_preprocessing/` — scripts for downloading and preparing datasets, including CrossFit tasks, math reasoning benchmarks, commonsense QA and instruction following corpora.
 - `src/` — core package containing configuration loading, dataset classes, prompt builders and active learning strategies.
 - `experiments/` — helper scripts for running batch experiments across tasks.
 - `docs/` — additional documentation including a design overview.
@@ -12,10 +12,11 @@ This directory contains the implementation of ActiveLLM. It is organised into se
 ```bash
 pip install -r requirements.txt
 ```
+To enable optional training and inference optimisations using [unsloth.ai](https://www.unsloth.ai), install the package and pass the `--use_unsloth` flag when running experiments. To avoid pulling heavy dependencies you may run `pip install --no-deps unsloth`.
 
 ## Preparing Data
 
-Run the preprocessing scripts to download and standardise the CrossFit datasets:
+Run the preprocessing scripts to download and standardise the datasets mentioned above:
 
 ```bash
 python data_preprocessing/download_datasets.py
