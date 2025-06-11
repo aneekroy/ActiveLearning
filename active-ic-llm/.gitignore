@@ -4,5 +4,4 @@ __pycache__/
 .data/
 data/
 outputs/
-ActiveLearning/data/raw
-ActiveLearning/data/standardized
+
