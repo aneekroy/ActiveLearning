@@ -19,16 +19,17 @@ CATEGORIES = {
     ],
     "math_reasoning": [
         ("gsm8k", "main"),
+        ("openai/gsm8k","socratic"),
         "aqua_rat",
         "allenai/lila", #AddSub
         "ChilleD/MultiArith",
-        "SingleEq", 
-        "SVAMP",
+        # "SingleEq", 
+        # "SVAMP",
         # "deepmind/math_dataset"
     ],
     "instruction_following": [
         "databricks/databricks-dolly-15k",
-        "lmsys/vicuna-eval",
+        # "lmsys/vicuna-eval",
         "yizhongw/self_instruct",
         "Dynosaur/dynosaur-sub-superni",
         "HuggingFaceH4/ultrachat_200k",
