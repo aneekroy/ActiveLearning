@@ -1,7 +1,9 @@
 """Wrapper utilities around HuggingFace causal language models."""
 
 from typing import List
+from pathlib import Path
 import os
+
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import math
@@ -11,9 +13,10 @@ class ModelUtils:
     def __init__(self, model_name: str, device: str = "cpu"):
         self.device = device
 
-        # If the user provides a local path, avoid network downloads by
+        # If the user provides a local path, avoid any network downloads by
         # forcing HuggingFace to load files only from that directory.
-        local = os.path.exists(model_name)
+        local = Path(model_name).exists()
+
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, local_files_only=local
         )
