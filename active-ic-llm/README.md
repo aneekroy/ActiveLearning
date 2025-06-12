@@ -44,6 +44,7 @@ For sampling strategies that rely on sentence embeddings, you can set the
 `SBERT_MODEL` environment variable to a local directory to load the embeddings
 model from disk.
 
+
 cd active-ic-llm
 python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-1b --num_shots 8
 python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-1b --num_shots 8

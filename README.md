@@ -28,6 +28,7 @@ python scripts/calc_avg.py
 If you pass a filesystem path to `--model_name`, the loader reads the model
 directly from that directory without accessing the HuggingFace Hub.
 
+
 Embeddings required for diversity and similarity sampling use the
 `SentenceTransformer` library. Set the `SBERT_MODEL` environment variable to a
 local path if you wish to avoid downloading the default model.

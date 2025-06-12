@@ -42,6 +42,7 @@ that path without contacting HuggingFace. You can also set the `SBERT_MODEL`
 environment variable to point to a local sentence transformer so that
 diversity/similarity sampling works offline.
 
+
 ## 5. Aggregate metrics across runs (optional)
 
 If you perform multiple runs of the same configuration you can average the metrics using the helper script:
