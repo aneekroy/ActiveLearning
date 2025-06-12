@@ -30,10 +30,11 @@ python active-ic-llm/data_preprocessing/prepare_crossfit.py
 
 ## 4. Run an experiment
 
-Experiments are driven by `active-ic-llm/src/run_experiment.py`. For example, to train on SST-2 with random sampling:
+Experiments are driven by the `src.run_experiment` module. Change into the package directory and invoke it with `-m`:
 
 ```bash
-python active-ic-llm/src/run_experiment.py --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
+cd active-ic-llm
+python -m src.run_experiment --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
 ```
 
 Outputs including predictions and metrics will be written under `outputs/<task_type>/<task>/<model>/<al_method>/`.
@@ -48,13 +49,14 @@ python scripts/aggregate_metrics.py --task sst2 --model bert-base-uncased --al_m
 
 The aggregated accuracy and F1 scores are stored in `outputs/<task>/<model>/<al_method>/avg_metrics.json`.
 
-If your runs only produce log files, edit `TASK` and `MODE` in `scripts/calc_avg.py` and run that script instead.
+cd active-ic-llm
+python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-1b --num_shots 8
+python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-1b --num_shots 8
+python -m src.run_experiment --task AddSub --al_method random --model_name llama-3.2-1b --num_shots 8
 
-
-
-## 6. Training Llama-3.2 models on math benchmarks
-
-To fine-tune the lightweight Llama-3.2 models on math reasoning datasets you can invoke `run_experiment.py` with the desired task name and model. The examples below train with random sampling and eight demonstration shots:
+python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-3b --num_shots 8
+python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-3b --num_shots 8
+python -m src.run_experiment --task AddSub --al_method random --model_name llama-3.2-3b --num_shots 8
 
 ```bash
 # 1B model

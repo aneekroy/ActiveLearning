@@ -7,11 +7,12 @@ for model in MODELS:
     for task in TASKS:
         cmd = [
             "python",
-            "active-ic-llm/src/run_experiment.py",
+            "-m",
+            "src.run_experiment",
             "--task", task,
             "--al_method", "random",
             "--model_name", model,
             "--num_shots", "8",
         ]
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, cwd="active-ic-llm")
 
