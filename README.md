@@ -6,8 +6,6 @@ The code is organised as a Python package under `active-ic-llm` and contains scr
 
 See `active-ic-llm/README.md` for details on how to install dependencies, prepare data and reproduce the experiments.
 
-The codebase optionally integrates the [unsloth.ai](https://www.unsloth.ai) library
-for faster model loading when the `--use_unsloth` flag is supplied.
 
 Prepared datasets span multiple benchmarks including math reasoning
 (e.g. GSM8k, AQUA-RAT), commonsense QA (BoolQ, HellaSwag, ARC, Winogrande, PiQA
@@ -26,6 +24,18 @@ Edit the `TASK` and `MODE` constants inside the script and run:
 ```bash
 python scripts/calc_avg.py
 ```
+
+If you pass a filesystem path to `--model_name`, the loader reads the model
+directly from that directory without accessing the HuggingFace Hub.
+
+Embeddings required for diversity and similarity sampling use the
+`SentenceTransformer` library. Set the `SBERT_MODEL` environment variable to a
+local path if you wish to avoid downloading the default model.
+
+The code uses PyTorch exclusively. TensorFlow and JAX imports are disabled
+automatically by setting the `TRANSFORMERS_NO_TF_IMPORT` and
+`TRANSFORMERS_NO_FLAX_IMPORT` environment variables before loading
+`transformers`.
 
 
 ## Step-by-Step Walkthrough
