@@ -1,30 +1,24 @@
 """Wrapper utilities around HuggingFace causal language models."""
 
 from typing import List
+from pathlib import Path
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
-
-try:
-    from unsloth.models import FastLanguageModel
-    _HAS_UNSLOTH = True
-except Exception:
-    _HAS_UNSLOTH = False
 import math
 
 
 class ModelUtils:
-    def __init__(self, model_name: str, device: str = "cpu", use_unsloth: bool = False):
+    def __init__(self, model_name: str, device: str = "cpu"):
         self.device = device
-        if use_unsloth and _HAS_UNSLOTH:
-            self.model, self.tokenizer = FastLanguageModel.from_pretrained(
-                model_name,
-                device_map="auto",
-                use_gradient_checkpointing=False,
-            )
-            self.model = self.model.to(device)
-        else:
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-            self.model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+        # If the user provides a local path, avoid any network downloads by
+        # forcing HuggingFace to load files only from that directory.
+        local = Path(model_name).exists()
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, local_files_only=local
+        )
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name, local_files_only=local
+        ).to(device)
 
     def compute_perplexity(self, text: str) -> float:
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
