@@ -17,7 +17,7 @@ Use the requirements file provided with the main package:
 pip install -r active-ic-llm/requirements.txt
 ```
 
-Optional features such as the `unsloth` library can be installed if you plan on using the `--use_unsloth` flag during training.
+Optional features such as the `unsloth` library can be installed if you plan on using the `--use_unsloth` flag during training. You can disable these optimisations by passing `--no-use_unsloth`.
 
 ## 3. Download and prepare datasets
 

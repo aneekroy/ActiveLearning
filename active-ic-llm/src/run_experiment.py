@@ -92,7 +92,12 @@ def main():
     parser.add_argument("--al_method", default=cfg.al_method)
     parser.add_argument("--model_name", default=cfg.model_name)
     parser.add_argument("--num_shots", type=int, default=cfg.num_shots)
-    parser.add_argument("--use_unsloth", action="store_true", default=cfg.use_unsloth)
+    parser.add_argument(
+        "--use_unsloth",
+        action=argparse.BooleanOptionalAction,
+        default=cfg.use_unsloth,
+        help="Enable Unsloth model loading (pass --no-use_unsloth to disable)",
+    )
     args = parser.parse_args()
 
     run(args.task, args.al_method, args.model_name, args.num_shots, args.use_unsloth)

@@ -7,7 +7,8 @@ The code is organised as a Python package under `active-ic-llm` and contains scr
 See `active-ic-llm/README.md` for details on how to install dependencies, prepare data and reproduce the experiments.
 
 The codebase optionally integrates the [unsloth.ai](https://www.unsloth.ai) library
-for faster model loading when the `--use_unsloth` flag is supplied.
+for faster model loading when the `--use_unsloth` flag is supplied. You can
+explicitly disable it by passing `--no-use_unsloth` on the command line.
 
 Prepared datasets span multiple benchmarks including math reasoning
 (e.g. GSM8k, AQUA-RAT), commonsense QA (BoolQ, HellaSwag, ARC, Winogrande, PiQA
