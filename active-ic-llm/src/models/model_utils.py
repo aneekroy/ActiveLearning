@@ -3,33 +3,12 @@
 from typing import List
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
-
-_HAS_UNSLOTH = False
-FastLanguageModel = None
 import math
 
 
 class ModelUtils:
-    def __init__(self, model_name: str, device: str = "cpu", use_unsloth: bool = False):
+    def __init__(self, model_name: str, device: str = "cpu"):
         self.device = device
-        if use_unsloth:
-            global _HAS_UNSLOTH, FastLanguageModel
-            if not _HAS_UNSLOTH:
-                try:
-                    from unsloth.models import FastLanguageModel as _FLM
-                    FastLanguageModel = _FLM
-                    _HAS_UNSLOTH = True
-                except Exception:
-                    _HAS_UNSLOTH = False
-            if _HAS_UNSLOTH:
-                self.model, self.tokenizer = FastLanguageModel.from_pretrained(
-                    model_name,
-                    device_map="auto",
-                    use_gradient_checkpointing=False,
-                )
-                self.model = self.model.to(device)
-                return
-        # fall back to standard transformers loader
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
 
