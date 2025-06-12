@@ -25,11 +25,11 @@ def get_sampler(name: str):
     raise ValueError(f"Unknown sampler {name}")
 
 
-def run(task: str, al_method: str, model_name: str, num_shots: int, use_unsloth: bool) -> None:
+def run(task: str, al_method: str, model_name: str, num_shots: int) -> None:
     pool_dataset = CrossFitDataset(task, "pool")
     test_dataset = CrossFitDataset(task, "test")
     sampler = get_sampler(al_method)
-    mu = ModelUtils(model_name, device=cfg.device, use_unsloth=use_unsloth)
+    mu = ModelUtils(model_name, device=cfg.device)
     label_space = sorted(set(pool_dataset.get_all_labels()))
 
     if al_method != "similarity":
@@ -92,10 +92,9 @@ def main():
     parser.add_argument("--al_method", default=cfg.al_method)
     parser.add_argument("--model_name", default=cfg.model_name)
     parser.add_argument("--num_shots", type=int, default=cfg.num_shots)
-    parser.add_argument("--use_unsloth", action="store_true", default=cfg.use_unsloth)
     args = parser.parse_args()
 
-    run(args.task, args.al_method, args.model_name, args.num_shots, args.use_unsloth)
+    run(args.task, args.al_method, args.model_name, args.num_shots)
 
 
 if __name__ == "__main__":
