@@ -10,6 +10,7 @@ import math
 class ModelUtils:
     def __init__(self, model_name: str, device: str = "cpu"):
         self.device = device
+
         # If the user provides a local path, avoid network downloads by
         # forcing HuggingFace to load files only from that directory.
         local = os.path.exists(model_name)
@@ -19,6 +20,7 @@ class ModelUtils:
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, local_files_only=local
         ).to(device)
+
 
     def compute_perplexity(self, text: str) -> float:
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
