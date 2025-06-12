@@ -37,12 +37,62 @@ Batch experiments for all tasks are available under `experiments/`.
 Outputs including per-example predictions and accuracy/F1 scores are written to the `outputs/` directory. The metrics file for a run can be found at `outputs/<task_type>/<task>/<model>/<al_method>/metrics.json`.
 To average metrics across multiple runs you can use `../scripts/aggregate_metrics.py`.
 
+
+## Category-wise Experiments
+
+Two convenience scripts run ActiveLLM across groups of tasks using different
+active learning strategies:
+
+- `experiments/classification_exp.py` iterates over all
+  `classification_tasks`, `math_reasoning_tasks` and `instruction_following_tasks`
+  defined in `config.yaml`.
+- `experiments/multichoice_exp.py` covers the `multichoice_tasks` and
+  `commonsense_tasks` lists.
+
+Both scripts accept a space separated list of strategies via the `--al_methods`
+argument (defaults to `random diversity uncertainty similarity`). For every
+combination of task and method they invoke `src/run_experiment.py`.
+
+Example running every classification task with all strategies:
+
+```bash
+python experiments/classification_exp.py --model_name bert-base-uncased --num_shots 8
+```
+
+You can limit the strategies to a subset, e.g.:
+
+```bash
+python experiments/classification_exp.py --al_methods random diversity --num_shots 8
+```
+
+The same interface applies to `multichoice_exp.py`.
+
+A combined script `experiments/all_tasks_exp.py` runs every task from all five categories (classification, multichoice, commonsense, math reasoning and instruction following) in one go. It accepts the same `--al_methods`, `--model_name` and `--num_shots` arguments and sequentially calls `src/run_experiment.py` for each combination.
+
+### Active learning methods
+
+ActiveLLM includes four samplers:
+
+| Method | Description |
+|--------|-------------|
+| `random` | Randomly pick `k` pool examples. |
+| `diversity` | Embed the pool with SentenceTransformer and select diverse examples using k-means clustering. |
+| `uncertainty` | Choose examples with highest perplexity under the current model. |
+| `similarity` | For each test instance select the pool items with most similar embeddings. |
+
+`run_experiment.py` loads the pool and test splits, applies the sampler to obtain
+demonstrations and builds prompts for either classification or multiple choice
+tasks. Predictions and metrics are then written under `outputs/`.
+
+### Llama-3.2 training examples
+
 If `--model_name` is a path on disk, the model will be loaded entirely from that
 directory without downloading files.
 
 For sampling strategies that rely on sentence embeddings, you can set the
 `SBERT_MODEL` environment variable to a local directory to load the embeddings
 model from disk.
+
 
 
 cd active-ic-llm

@@ -16,18 +16,23 @@ def main():
     args = parser.parse_args()
 
     task_lists = [
+        cfg.classification_tasks,
         cfg.multichoice_tasks,
         cfg.get("commonsense_tasks", []),
+        cfg.get("math_reasoning_tasks", []),
+        cfg.get("instruction_following_tasks", []),
     ]
-    for task_list in task_lists:
-        for task in task_list:
-            for method in args.al_methods:
-                cmd = ["python", "src/run_experiment.py", "--task", task, "--al_method", method]
-                if args.model_name:
-                    cmd += ["--model_name", args.model_name]
-                if args.num_shots is not None:
-                    cmd += ["--num_shots", str(args.num_shots)]
-                call(cmd)
+
+    tasks = sorted(set(task for lst in task_lists for task in lst))
+
+    for task in tasks:
+        for method in args.al_methods:
+            cmd = ["python", "src/run_experiment.py", "--task", task, "--al_method", method]
+            if args.model_name:
+                cmd += ["--model_name", args.model_name]
+            if args.num_shots is not None:
+                cmd += ["--num_shots", str(args.num_shots)]
+            call(cmd)
 
 
 if __name__ == "__main__":
