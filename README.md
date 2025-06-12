@@ -6,8 +6,6 @@ The code is organised as a Python package under `active-ic-llm` and contains scr
 
 See `active-ic-llm/README.md` for details on how to install dependencies, prepare data and reproduce the experiments.
 
-The codebase optionally integrates the [unsloth.ai](https://www.unsloth.ai) library
-for faster model loading when the `--use_unsloth` flag is supplied.
 
 Prepared datasets span multiple benchmarks including math reasoning
 (e.g. GSM8k, AQUA-RAT), commonsense QA (BoolQ, HellaSwag, ARC, Winogrande, PiQA
@@ -26,6 +24,9 @@ Edit the `TASK` and `MODE` constants inside the script and run:
 ```bash
 python scripts/calc_avg.py
 ```
+
+If you pass a filesystem path to `--model_name`, the loader reads the model
+directly from that directory without accessing the HuggingFace Hub.
 
 
 ## Step-by-Step Walkthrough
