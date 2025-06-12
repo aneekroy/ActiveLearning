@@ -37,6 +37,9 @@ Batch experiments for all tasks are available under `experiments/`.
 Outputs including per-example predictions and accuracy/F1 scores are written to the `outputs/` directory. The metrics file for a run can be found at `outputs/<task_type>/<task>/<model>/<al_method>/metrics.json`.
 To average metrics across multiple runs you can use `../scripts/aggregate_metrics.py`.
 
+If `--model_name` is a path on disk, the model will be loaded entirely from that
+directory without downloading files.
+
 cd active-ic-llm
 python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-1b --num_shots 8
 python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-1b --num_shots 8

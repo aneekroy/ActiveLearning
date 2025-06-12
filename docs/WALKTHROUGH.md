@@ -37,6 +37,9 @@ python -m src.run_experiment --task sst2 --al_method random --model_name bert-ba
 
 Outputs including predictions and metrics will be written under `outputs/<task_type>/<task>/<model>/<al_method>/`.
 
+If you provide a local directory to `--model_name`, the model is loaded from
+that path without contacting HuggingFace.
+
 ## 5. Aggregate metrics across runs (optional)
 
 If you perform multiple runs of the same configuration you can average the metrics using the helper script:

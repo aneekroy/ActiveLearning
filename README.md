@@ -25,6 +25,9 @@ Edit the `TASK` and `MODE` constants inside the script and run:
 python scripts/calc_avg.py
 ```
 
+If you pass a filesystem path to `--model_name`, the loader reads the model
+directly from that directory without accessing the HuggingFace Hub.
+
 
 ## Step-by-Step Walkthrough
 
