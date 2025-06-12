@@ -38,7 +38,10 @@ python -m src.run_experiment --task sst2 --al_method random --model_name bert-ba
 Outputs including predictions and metrics will be written under `outputs/<task_type>/<task>/<model>/<al_method>/`.
 
 If you provide a local directory to `--model_name`, the model is loaded from
-that path without contacting HuggingFace.
+that path without contacting HuggingFace. You can also set the `SBERT_MODEL`
+environment variable to point to a local sentence transformer so that
+diversity/similarity sampling works offline.
+
 
 ## 5. Aggregate metrics across runs (optional)
 
