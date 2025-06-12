@@ -47,7 +47,9 @@ python scripts/aggregate_metrics.py --task sst2 --model bert-base-uncased --al_m
 ```
 
 The aggregated accuracy and F1 scores are stored in `outputs/<task>/<model>/<al_method>/avg_metrics.json`.
+
 If your runs only produce log files, edit `TASK` and `MODE` in `scripts/calc_avg.py` and run that script instead.
+
 
 
 ## 6. Training Llama-3.2 models on math benchmarks
@@ -66,6 +68,7 @@ python active-ic-llm/src/run_experiment.py --task MultiArith --al_method random 
 python active-ic-llm/src/run_experiment.py --task AddSub --al_method random --model_name llama-3.2-3b --num_shots 8
 ```
 
+
 ### 7. Evaluating the trained models
 
 After running the training commands you can evaluate both models on the same set of tasks using:
@@ -73,3 +76,4 @@ After running the training commands you can evaluate both models on the same set
 ```bash
 python scripts/run_llama_eval.py
 ```
+

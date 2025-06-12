@@ -6,11 +6,10 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 import json
 import random
-
+import os
 
 def _read_jsonl(jsonl_path: Path):
     return [json.loads(line) for line in jsonl_path.read_text().splitlines()]
-
 
 def prepare_classification(records) -> pd.DataFrame:
     return pd.DataFrame(
@@ -20,7 +19,6 @@ def prepare_classification(records) -> pd.DataFrame:
             "label": [r.get("label", r.get("answer")) for r in records],
         }
     )
-
 
 def prepare_multichoice(records) -> pd.DataFrame:
     questions = []
@@ -37,13 +35,11 @@ def prepare_multichoice(records) -> pd.DataFrame:
         labels.append(r.get("label"))
     return pd.DataFrame({"id": range(len(records)), "question": questions, "choices": choices, "label": labels})
 
-
 def split_and_save(df: pd.DataFrame, out_prefix: Path, seed: int = 42, test_size: float = 0.2) -> None:
     df_shuf = df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
     pool, test = train_test_split(df_shuf, test_size=test_size, random_state=seed)
     pool.to_csv(f"{out_prefix}_pool.csv", index=False)
     test.to_csv(f"{out_prefix}_test.csv", index=False)
-
 
 def process_task(task_dir: Path, out_dir: Path, seed: int = 42) -> None:
     for split_file in task_dir.glob("*.jsonl"):
@@ -56,11 +52,14 @@ def process_task(task_dir: Path, out_dir: Path, seed: int = 42) -> None:
         split_and_save(df, out_prefix, seed=seed)
         break  # assume single split file per task
 
-
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--raw_dir", default="data/raw")
-    parser.add_argument("--out_dir", default="data/standardized")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    RAW_DIR = os.path.abspath(os.path.join(script_dir, "../../data/raw"))
+    OUT_DIR = os.path.abspath(os.path.join(script_dir, "../../data/standardized"))
+
+    parser.add_argument("--raw_dir", default=RAW_DIR)
+    parser.add_argument("--out_dir", default=OUT_DIR)
     args = parser.parse_args()
 
     raw_dir = Path(args.raw_dir)
@@ -73,7 +72,6 @@ def main():
         for task_dir in category_dir.iterdir():
             if task_dir.is_dir():
                 process_task(task_dir, out_dir)
-
 
 if __name__ == "__main__":
     main()

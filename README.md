@@ -20,11 +20,13 @@ Use `scripts/aggregate_metrics.py` to compute the average accuracy and F1 across
 ```bash
 python scripts/aggregate_metrics.py --task <task> --model <model_name> --al_method <strategy>
 ```
+
 If your experiments write log files instead of metrics JSON, `scripts/calc_avg.py` replicates the averaging used in the original ActiveLLM repo.
 Edit the `TASK` and `MODE` constants inside the script and run:
 ```bash
 python scripts/calc_avg.py
 ```
+
 
 ## Step-by-Step Walkthrough
 
@@ -34,6 +36,7 @@ A concise walkthrough covering setup, dataset preparation and running a sample e
 
 See [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md#6-training-llama-3-2-models-on-math-benchmarks) for commands that fine-tune the 1B and 3B Llama-3.2 models on GSM8k, MultiArith and AddSub.
 
+
 ### Example: evaluating the math benchmarks
 
 Use `scripts/run_llama_eval.py` to automatically run the evaluation for both models on the same three datasets:
@@ -41,3 +44,4 @@ Use `scripts/run_llama_eval.py` to automatically run the evaluation for both mod
 ```bash
 python scripts/run_llama_eval.py
 ```
+
