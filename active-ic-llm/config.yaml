@@ -42,10 +42,10 @@ instruction_following_tasks: [
 ]
 
 data_dir: data
-standardized_dir: data/standardized
-raw_dir: data/raw
+standardized_dir: /home/aneek/src/ActiveLearning/data/standardized
+raw_dir: /home/aneek/src/ActiveLearning/data/raw
 outputs_dir: outputs
 
 max_seq_length: 128
 seed: 42
-device: gpu
+device: cuda

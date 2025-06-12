@@ -13,7 +13,7 @@ def _load_model() -> SentenceTransformer:
     """Lazily load the sentence transformer to avoid unnecessary downloads."""
     global _sbert_model
     if _sbert_model is None:
-        model_name = os.environ.get("SBERT_MODEL", "all-MiniLM-L6-v2")
+        model_name = os.environ.get("SBERT_MODEL", "/home/aneek/models/all-MiniLM-L6-v2")
         local = Path(model_name).exists()
         _sbert_model = SentenceTransformer(model_name, local_files_only=local)
     return _sbert_model
