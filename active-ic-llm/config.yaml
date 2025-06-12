@@ -2,16 +2,50 @@ model_name: bert-base-uncased
 al_method: random
 num_shots: 8
 pool_fraction: 0.2
+
 classification_tasks: ["sst2", "boolq"]
-multichoice_tasks: ["hellaswag", "arc-c", "arc-e", "winogrande", "piqa", "siqa", "obqa"]
-commonsense_tasks: ["hellaswag", "arc-c", "arc-e", "winogrande", "piqa", "siqa", "obqa"]
-math_reasoning_tasks: ["gsm8k", "aqua_rat", "addsub", "multiarith", "singleeq", "svamp"]
-instruction_following_tasks: ["dolly_eval", "vicuna_eval", "self_instruct", "s_ni", "un_ni"]
+
+multichoice_tasks: [
+  "hellaswag",
+  "allenai_ai2_arc_ARC-Challenge",  # arc-c
+  "allenai_ai2_arc_ARC-Easy",       # arc-e
+  "winogrande_winogrande_xl",       # winogrande
+  "piqa",
+  "social_i_qa",                    # siqa
+  "openbookqa"                      # obqa
+]
+
+commonsense_tasks: [
+  "hellaswag",
+  "allenai_ai2_arc_ARC-Challenge",
+  "allenai_ai2_arc_ARC-Easy",
+  "winogrande_winogrande_xl",
+  "piqa",
+  "social_i_qa",
+  "openbookqa"
+]
+
+math_reasoning_tasks: [
+  "gsm8k_main",                     # gsm8k
+  "aqua_rat",
+  "allenai_lila",                   
+  "ChilleD_MultiArith",            # multiarith
+  "SingleEq",                       # singleeq
+  "SVAMP"
+]
+
+instruction_following_tasks: [
+  "databricks_databricks-dolly-15k",     # dolly_eval
+  "HuggingFaceH4_ultrachat_200k",        # vicuna_eval
+  "yizhongw_self_instruct",              # self_instruct
+  "Dinosaur_dinosaur-sub-superni"        # s_ni
+]
+
 data_dir: data
 standardized_dir: data/standardized
 raw_dir: data/raw
 outputs_dir: outputs
+
 max_seq_length: 128
 seed: 42
-device: cpu
-use_unsloth: false
+device: gpu

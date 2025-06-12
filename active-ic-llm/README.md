@@ -12,7 +12,6 @@ This directory contains the implementation of ActiveLLM. It is organised into se
 ```bash
 pip install -r requirements.txt
 ```
-To enable optional training and inference optimisations using [unsloth.ai](https://www.unsloth.ai), install the package and pass the `--use_unsloth` flag when running experiments. To avoid pulling heavy dependencies you may run `pip install --no-deps unsloth`.
 
 ## Preparing Data
 
@@ -27,13 +26,17 @@ python data_preprocessing/prepare_crossfit.py
 
 Example usage:
 
+Run the experiment module from within the `active-ic-llm` directory:
+
 ```bash
-python src/run_experiment.py --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
+cd active-ic-llm
+python -m src.run_experiment --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
 ```
 
 Batch experiments for all tasks are available under `experiments/`.
 Outputs including per-example predictions and accuracy/F1 scores are written to the `outputs/` directory. The metrics file for a run can be found at `outputs/<task_type>/<task>/<model>/<al_method>/metrics.json`.
 To average metrics across multiple runs you can use `../scripts/aggregate_metrics.py`.
+
 
 ## Category-wise Experiments
 
@@ -83,7 +86,22 @@ tasks. Predictions and metrics are then written under `outputs/`.
 
 ### Llama-3.2 training examples
 
-The commands below illustrate how to run `run_experiment.py` with the 1B and 3B Llama-3.2 models on three math reasoning tasks:
+If `--model_name` is a path on disk, the model will be loaded entirely from that
+directory without downloading files.
+
+For sampling strategies that rely on sentence embeddings, you can set the
+`SBERT_MODEL` environment variable to a local directory to load the embeddings
+model from disk.
+
+
+
+cd active-ic-llm
+python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-1b --num_shots 8
+python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-1b --num_shots 8
+python -m src.run_experiment --task AddSub --al_method random --model_name llama-3.2-1b --num_shots 8
+python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-3b --num_shots 8
+python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-3b --num_shots 8
+python -m src.run_experiment --task AddSub --al_method random --model_name llama-3.2-3b --num_shots 8
 
 ```bash
 # 1B model
@@ -96,3 +114,13 @@ python src/run_experiment.py --task gsm8k --al_method random --model_name llama-
 python src/run_experiment.py --task MultiArith --al_method random --model_name llama-3.2-3b --num_shots 8
 python src/run_experiment.py --task AddSub --al_method random --model_name llama-3.2-3b --num_shots 8
 ```
+
+
+### Evaluation script
+
+To reproduce the evaluation for both models on the math benchmarks run:
+
+```bash
+python ../scripts/run_llama_eval.py
+```
+
