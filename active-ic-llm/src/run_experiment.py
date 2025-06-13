@@ -29,7 +29,7 @@ def run(task: str, al_method: str, model_name: str, num_shots: int) -> None:
     pool_dataset = CrossFitDataset(task, "pool")
     test_dataset = CrossFitDataset(task, "test")
     sampler = get_sampler(al_method)
-    mu = ModelUtils(model_name, device=cfg.device)
+    mu = ModelUtils(model_name, device=cfg.device, num_gpus=cfg.num_gpus)
     label_space = sorted(set(pool_dataset.get_all_labels()))
 
     if al_method != "similarity":
@@ -92,7 +92,11 @@ def main():
     parser.add_argument("--al_method", default=cfg.al_method)
     parser.add_argument("--model_name", default=cfg.model_name)
     parser.add_argument("--num_shots", type=int, default=cfg.num_shots)
+    parser.add_argument("--num_gpus", type=int, default=cfg.num_gpus)
     args = parser.parse_args()
+
+    # Update config in case command-line overrides were provided
+    cfg.num_gpus = args.num_gpus
 
     run(args.task, args.al_method, args.model_name, args.num_shots)
 
