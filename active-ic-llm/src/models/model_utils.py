@@ -2,7 +2,6 @@
 
 from typing import List
 from pathlib import Path
-
 import os
 
 
@@ -19,25 +18,15 @@ import math
 
 
 class ModelUtils:
-    def __init__(self, model_name: str, device: str = "cpu", num_gpus: int = 1):
+    def __init__(self, model_name: str, device: str = "cpu", num_gpus: int = 1, use_fp16: bool = False):
         self.device = device
         self.num_gpus = num_gpus
+        self.use_fp16 = use_fp16
 
-        # If the user provides a local path, avoid any network downloads by
-        # forcing HuggingFace to load files only from that directory.
         local = Path(model_name).exists()
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, local_files_only=local)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, local_files_only=local)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, local_files_only=local
-        )
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, local_files_only=local
-        )
-
-        # Some models (e.g. LLaMA) do not define a padding token by default
-        # which causes the HuggingFace tokenizer to raise an error when
-        # padding is requested. Reuse the EOS token in that case to avoid
-        # expanding the vocabulary.
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
@@ -51,18 +40,15 @@ class ModelUtils:
 
         self.model = self.model.to(device).eval()
 
-
-
-
     def compute_perplexity(self, text: str) -> float:
-        inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
+        inputs = self.tokenizer(text, return_tensors="pt")
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
         with torch.no_grad():
             outputs = self.model(**inputs, labels=inputs["input_ids"])
             loss = outputs.loss
         return math.exp(loss.item())
 
     def compute_batch_perplexity(self, texts: List[str], batch_size: int = 8) -> List[float]:
-        """Compute perplexities for a list of texts in batches."""
         perplexities = []
         for i in range(0, len(texts), batch_size):
             batch = texts[i : i + batch_size]
@@ -71,55 +57,71 @@ class ModelUtils:
             if self.tokenizer.pad_token_id is not None:
                 labels[labels == self.tokenizer.pad_token_id] = -100
             enc = {k: v.to(self.device) for k, v in enc.items()}
+            labels = labels.to(self.device)
+
             with torch.no_grad():
-                logits = self.model(**enc, labels=labels.to(self.device)).logits
+                outputs = self.model(**enc, labels=labels)
+                logits = outputs.logits
+
             shift_logits = logits[:, :-1, :].contiguous()
-            shift_labels = labels[:, 1:].to(self.device)
+            shift_labels = labels[:, 1:]
             loss_fct = torch.nn.CrossEntropyLoss(reduction="none")
             losses = loss_fct(
                 shift_logits.view(-1, shift_logits.size(-1)),
                 shift_labels.view(-1),
-            )
-            losses = losses.view(shift_labels.size())
+            ).view(shift_labels.size())
+
             mask = shift_labels != -100
             seq_loss = (losses * mask).sum(1) / mask.sum(1)
             perplexities.extend(torch.exp(seq_loss).tolist())
         return perplexities
 
     def _score_completion(self, text: str) -> float:
-        inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
+        inputs = self.tokenizer(text, return_tensors="pt")
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
         with torch.no_grad():
             outputs = self.model(**inputs)
             log_probs = torch.log_softmax(outputs.logits[:, :-1, :], dim=-1)
+
         ids = inputs["input_ids"][:, 1:]
         token_log_prob = log_probs.gather(2, ids.unsqueeze(-1)).squeeze(-1).sum().item()
         return token_log_prob
 
-    def _score_completion_batch(self, texts: List[str]) -> List[float]:
-        """Score multiple completions in a batch to utilize DataParallel."""
-        enc = self.tokenizer(texts, return_tensors="pt", padding=True)
-        labels = enc["input_ids"].clone()
-        if self.tokenizer.pad_token_id is not None:
-            labels[labels == self.tokenizer.pad_token_id] = -100
-        enc = {k: v.to(self.device) for k, v in enc.items()}
-        with torch.no_grad():
-            logits = self.model(**enc).logits
-        shift_logits = logits[:, :-1, :].contiguous()
-        shift_labels = labels[:, 1:].to(self.device)
-        log_probs = torch.log_softmax(shift_logits, dim=-1)
-        gather = log_probs.gather(2, shift_labels.unsqueeze(-1)).squeeze(-1)
-        mask = shift_labels != -100
-        seq_log_prob = (gather * mask).sum(1)
-        return seq_log_prob.tolist()
+    def _score_completion_batch(self, texts: List[str], batch_size: int = 1) -> List[float]:
+        scores = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            enc = self.tokenizer(batch, return_tensors="pt", padding=True)
+            labels = enc["input_ids"].clone()
+            if self.tokenizer.pad_token_id is not None:
+                labels[labels == self.tokenizer.pad_token_id] = -100
+            enc = {k: v.to(self.device) for k, v in enc.items()}
+            labels = labels.to(self.device)
 
-    def predict_classification(self, prompt: str, candidate_labels: List[str]) -> str:
-        prompts = [prompt + " " + label for label in candidate_labels]
-        scores = self._score_completion_batch(prompts)
+            with torch.no_grad():
+                if self.use_fp16:
+                    with torch.cuda.amp.autocast():
+                        logits = self.model(**enc).logits
+                else:
+                    logits = self.model(**enc).logits
+
+            shift_logits = logits[:, :-1, :].contiguous()
+            shift_labels = labels[:, 1:]
+            log_probs = torch.log_softmax(shift_logits, dim=-1)
+            gather = log_probs.gather(2, shift_labels.unsqueeze(-1)).squeeze(-1)
+            mask = shift_labels != -100
+            seq_log_prob = (gather * mask).sum(1)
+            scores.extend(seq_log_prob.tolist())
+
+        return scores
+
+    def predict_classification(self, prompt: str, candidate_labels: List[str], batch_size: int = 1) -> str:
+        prompts = [f"{prompt} {label}" for label in candidate_labels]
+        scores = self._score_completion_batch(prompts, batch_size=batch_size)
         return candidate_labels[int(torch.tensor(scores).argmax())]
 
-    def predict_multichoice(self, prompt: str, choices: List[str]) -> str:
-        letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(choices)]
-        prompts = [prompt + f" {letter}) {choice}" for letter, choice in zip(letters, choices)]
-        scores = self._score_completion_batch(prompts)
-        best_idx = int(torch.tensor(scores).argmax())
-        return letters[best_idx]
+    def predict_multichoice(self, prompt: str, choices: List[str], batch_size: int = 1) -> str:
+        letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[:len(choices)]
+        prompts = [f"{prompt} {letter}) {choice}" for letter, choice in zip(letters, choices)]
+        scores = self._score_completion_batch(prompts, batch_size=batch_size)
+        return letters[int(torch.tensor(scores).argmax())]

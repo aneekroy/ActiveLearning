@@ -68,7 +68,15 @@ model = model.cuda(0)
 
 For large models switching to `torch.distributed`'s
 `DistributedDataParallel` is recommended. Launch the experiment with:
-
+Instead of :
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3  python -m src.run_experiment --task gsm8k --al_method random --model_name /home/models/Llama-3.2-1B --num_shots 8
+```
+run 
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3  torchrun --nproc_per_node=4 src/run_experiment_ddp.py \
+    --task gsm8k_main --al_method random --model_name /home/models/Llama-3.2-1B --num_shots 8
+```
 ```bash
 torchrun --nproc_per_node=4 src/run_experiment_ddp.py \
     --task <task> --al_method <method> --model_name <path> --num_shots 8
