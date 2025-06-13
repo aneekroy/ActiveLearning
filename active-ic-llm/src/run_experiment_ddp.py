@@ -10,11 +10,25 @@ from sklearn.metrics import f1_score
 import torch
 import torch.distributed as dist
 
-from .config import cfg
-from .data_loader import CrossFitDataset
-from .prompt_builder import build_classification_prompt, build_multichoice_prompt
-from .models.model_utils import ModelUtils
-from .al import RandomSampler, DiversitySampler, UncertaintySampler, SimilaritySampler
+try:  # prefer package relative imports
+    from .config import cfg
+    from .data_loader import CrossFitDataset
+    from .prompt_builder import build_classification_prompt, build_multichoice_prompt
+    from .models.model_utils import ModelUtils
+    from .al import RandomSampler, DiversitySampler, UncertaintySampler, SimilaritySampler
+except ImportError:  # allow execution as a standalone script
+    import sys
+
+    current_dir = Path(__file__).resolve().parent
+    sys.path.append(str(current_dir))
+    sys.path.append(str(current_dir.parent))
+
+    from config import cfg
+    from data_loader import CrossFitDataset
+    from prompt_builder import build_classification_prompt, build_multichoice_prompt
+    from models.model_utils import ModelUtils
+    from al import RandomSampler, DiversitySampler, UncertaintySampler, SimilaritySampler
+
 from tqdm import tqdm
 
 
