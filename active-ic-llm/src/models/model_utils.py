@@ -34,6 +34,13 @@ class ModelUtils:
             model_name, local_files_only=local
         )
 
+        # Some models (e.g. LLaMA) do not define a padding token by default
+        # which causes the HuggingFace tokenizer to raise an error when
+        # padding is requested. Reuse the EOS token in that case to avoid
+        # expanding the vocabulary.
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+
         if device.startswith("cuda") and torch.cuda.is_available():
             available = torch.cuda.device_count()
             if available > 1:
