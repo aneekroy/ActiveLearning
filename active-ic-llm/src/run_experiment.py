@@ -11,6 +11,7 @@ from .data_loader import CrossFitDataset
 from .prompt_builder import build_classification_prompt, build_multichoice_prompt
 from .models.model_utils import ModelUtils
 from .al import RandomSampler, DiversitySampler, UncertaintySampler, SimilaritySampler
+from tqdm import tqdm
 
 
 def get_sampler(name: str):
@@ -37,7 +38,7 @@ def run(task: str, al_method: str, model_name: str, num_shots: int) -> None:
         demos = [pool_dataset[i] for i in demo_indices]
 
     results = []
-    for idx in range(len(test_dataset)):
+    for idx in tqdm(range(len(test_dataset)), desc="Evaluating", unit="ex"):
         item = test_dataset[idx]
         if isinstance(item[0], str) and len(item) == 2:
             text, gold = item
