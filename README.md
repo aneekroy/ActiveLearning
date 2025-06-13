@@ -51,3 +51,28 @@ Use `scripts/run_llama_eval.py` to automatically run the evaluation for both mod
 python scripts/run_llama_eval.py
 ```
 
+### Avoiding GPU 0 OOM in multi-GPU runs
+
+`run_experiment.py` relies on PyTorch **DataParallel** when more than one GPU is
+available. The first listed device keeps an extra copy of the model and gathers
+the outputs, which can quickly exhaust the memory of GPU 0.
+
+To balance usage you can hide GPU 0 or change the gather device:
+
+```bash
+CUDA_VISIBLE_DEVICES=1,2,3 python -m src.run_experiment ...
+
+model = torch.nn.DataParallel(model, device_ids=[0,1,2,3], output_device=3)
+model = model.cuda(0)
+```
+
+For large models switching to `torch.distributed`'s
+`DistributedDataParallel` is recommended. Launch the experiment with:
+
+```bash
+torchrun --nproc_per_node=4 src/run_experiment_ddp.py \
+    --task <task> --al_method <method> --model_name <path> --num_shots 8
+```
+
+See [docs/GPU_PARALLELISM.md](docs/GPU_PARALLELISM.md) for details.
+

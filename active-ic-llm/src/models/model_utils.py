@@ -43,10 +43,10 @@ class ModelUtils:
 
         if device.startswith("cuda") and torch.cuda.is_available():
             available = torch.cuda.device_count()
-            if available > 1:
+            if self.num_gpus > 1 and available > 1:
                 gpus = list(range(min(self.num_gpus, available)))
                 self.model = torch.nn.DataParallel(self.model, device_ids=gpus)
-                
+
             torch.backends.cudnn.benchmark = True
 
         self.model = self.model.to(device).eval()
