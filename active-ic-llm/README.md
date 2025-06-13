@@ -31,6 +31,8 @@ Run the experiment module from within the `active-ic-llm` directory:
 ```bash
 cd active-ic-llm
 python -m src.run_experiment --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
+# Optionally control batching for perplexity-based sampling
+python -m src.run_experiment --task sst2 --al_method uncertainty --model_name bert-base-uncased --num_shots 8 --perplexity_batch_size 16
 ```
 
 Batch experiments for all tasks are available under `experiments/`.

@@ -11,9 +11,17 @@ class UncertaintySampler:
         self.model_name = cfg.model_name
         self.device = cfg.device
         self.num_gpus = cfg.num_gpus
+        self.batch_size = cfg.perplexity_batch_size
 
     def select(self, pool_dataset, k: int) -> List[int]:
         texts = pool_dataset.get_all_texts()
-        perplexities = compute_perplexities(texts, self.model_name, self.device, self.num_gpus)
+        perplexities = compute_perplexities(
+            texts,
+            self.model_name,
+            self.device,
+            self.num_gpus,
+            self.batch_size,
+        )
+
         ranked = sorted(range(len(texts)), key=lambda i: perplexities[i], reverse=True)
         return ranked[:k]

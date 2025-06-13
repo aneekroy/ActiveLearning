@@ -93,10 +93,20 @@ def main():
     parser.add_argument("--model_name", default=cfg.model_name)
     parser.add_argument("--num_shots", type=int, default=cfg.num_shots)
     parser.add_argument("--num_gpus", type=int, default=cfg.num_gpus)
+
+    parser.add_argument(
+        "--perplexity_batch_size",
+        type=int,
+        default=cfg.perplexity_batch_size,
+    )
+
     args = parser.parse_args()
 
     # Update config in case command-line overrides were provided
     cfg.num_gpus = args.num_gpus
+
+    cfg.perplexity_batch_size = args.perplexity_batch_size
+
 
     run(args.task, args.al_method, args.model_name, args.num_shots)
 
