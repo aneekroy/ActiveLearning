@@ -34,6 +34,7 @@ Experiments are driven by the `src.run_experiment` module. Change into the packa
 cd active-ic-llm
 python -m src.run_experiment --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
 ```
+The command will display a progress bar while evaluating the test set.
 
 Outputs including predictions and metrics will be written under `outputs/<task_type>/<task>/<model>/<al_method>/`.
 
@@ -61,6 +62,9 @@ python -m src.run_experiment --task AddSub --al_method random --model_name llama
 python -m src.run_experiment --task gsm8k --al_method random --model_name llama-3.2-3b --num_shots 8
 python -m src.run_experiment --task MultiArith --al_method random --model_name llama-3.2-3b --num_shots 8
 python -m src.run_experiment --task AddSub --al_method random --model_name llama-3.2-3b --num_shots 8
+
+The commands above now display a progress bar to indicate how many test examples
+have been processed.
 
 ```bash
 # 1B model
