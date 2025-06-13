@@ -88,13 +88,31 @@ class ModelUtils:
         token_log_prob = log_probs.gather(2, ids.unsqueeze(-1)).squeeze(-1).sum().item()
         return token_log_prob
 
+    def _score_completion_batch(self, texts: List[str]) -> List[float]:
+        """Score multiple completions in a batch to utilize DataParallel."""
+        enc = self.tokenizer(texts, return_tensors="pt", padding=True)
+        labels = enc["input_ids"].clone()
+        if self.tokenizer.pad_token_id is not None:
+            labels[labels == self.tokenizer.pad_token_id] = -100
+        enc = {k: v.to(self.device) for k, v in enc.items()}
+        with torch.no_grad():
+            logits = self.model(**enc).logits
+        shift_logits = logits[:, :-1, :].contiguous()
+        shift_labels = labels[:, 1:].to(self.device)
+        log_probs = torch.log_softmax(shift_logits, dim=-1)
+        gather = log_probs.gather(2, shift_labels.unsqueeze(-1)).squeeze(-1)
+        mask = shift_labels != -100
+        seq_log_prob = (gather * mask).sum(1)
+        return seq_log_prob.tolist()
+
     def predict_classification(self, prompt: str, candidate_labels: List[str]) -> str:
-        scores = {label: self._score_completion(prompt + " " + label) for label in candidate_labels}
-        return max(scores, key=scores.get)
+        prompts = [prompt + " " + label for label in candidate_labels]
+        scores = self._score_completion_batch(prompts)
+        return candidate_labels[int(torch.tensor(scores).argmax())]
 
     def predict_multichoice(self, prompt: str, choices: List[str]) -> str:
         letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")[: len(choices)]
-        scores = {}
-        for letter, choice in zip(letters, choices):
-            scores[letter] = self._score_completion(prompt + f" {letter}) {choice}")
-        return max(scores, key=scores.get)
+        prompts = [prompt + f" {letter}) {choice}" for letter, choice in zip(letters, choices)]
+        scores = self._score_completion_batch(prompts)
+        best_idx = int(torch.tensor(scores).argmax())
+        return letters[best_idx]
