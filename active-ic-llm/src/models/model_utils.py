@@ -5,15 +5,15 @@ from pathlib import Path
 
 import os
 
-
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import math
 
 
 class ModelUtils:
-    def __init__(self, model_name: str, device: str = "cpu"):
+    def __init__(self, model_name: str, device: str = "cpu", num_gpus: int = 1):
         self.device = device
+        self.num_gpus = num_gpus
 
         # If the user provides a local path, avoid any network downloads by
         # forcing HuggingFace to load files only from that directory.
@@ -24,7 +24,15 @@ class ModelUtils:
         )
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, local_files_only=local
-        ).to(device)
+        )
+
+        if device.startswith("cuda") and torch.cuda.is_available():
+            available = torch.cuda.device_count()
+            if available > 1:
+                gpus = list(range(min(self.num_gpus, available)))
+                self.model = torch.nn.DataParallel(self.model, device_ids=gpus)
+
+        self.model = self.model.to(device)
 
 
     def compute_perplexity(self, text: str) -> float:
