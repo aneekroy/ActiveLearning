@@ -15,3 +15,5 @@ def compute_perplexities(
     """Compute perplexities for a list of texts using batched inference."""
     mu = ModelUtils(model_name, device=device, num_gpus=num_gpus)
     return mu.compute_batch_perplexity(texts, batch_size=batch_size)
+
+

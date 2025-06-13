@@ -22,5 +22,6 @@ class UncertaintySampler:
             self.num_gpus,
             self.batch_size,
         )
+
         ranked = sorted(range(len(texts)), key=lambda i: perplexities[i], reverse=True)
         return ranked[:k]

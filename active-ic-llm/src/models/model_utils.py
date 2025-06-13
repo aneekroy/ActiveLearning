@@ -5,11 +5,13 @@ from pathlib import Path
 
 import os
 
+
 # Prevent transformers from importing TensorFlow or Flax which slows down
 # startup and emits unwanted log messages.
 os.environ.setdefault("TRANSFORMERS_NO_TF_IMPORT", "1")
 os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -37,9 +39,12 @@ class ModelUtils:
             if available > 1:
                 gpus = list(range(min(self.num_gpus, available)))
                 self.model = torch.nn.DataParallel(self.model, device_ids=gpus)
+                
             torch.backends.cudnn.benchmark = True
 
         self.model = self.model.to(device).eval()
+
+
 
 
     def compute_perplexity(self, text: str) -> float:
