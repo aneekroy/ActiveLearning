@@ -66,30 +66,55 @@ def run(task: str, al_method: str, model_name: str, num_shots: int) -> None:
     sampler = get_sampler(al_method)
     mu = ModelUtils(model_name, device=cfg.device, num_gpus=1)
     label_space = sorted(set(pool_dataset.get_all_labels()))
+    batch_size = cfg.inference_batch_size
+    classification = "text" in pool_dataset.df.columns
 
     if al_method != "similarity":
-        demo_indices = sampler.select(pool_dataset, num_shots)
+        demo_indices = None
+        if rank == 0:
+            demo_indices = sampler.select(pool_dataset, num_shots)
+        obj_list = [demo_indices]
+        dist.broadcast_object_list(obj_list, src=0)
+        demo_indices = obj_list[0]
         demos = [pool_dataset[i] for i in demo_indices]
 
     results = []
-    iterator = range(rank, len(test_dataset), world_size)
-    for idx in tqdm(iterator, desc="Evaluating", unit="ex", disable=rank != 0):
-        item = test_dataset[idx]
-        if isinstance(item[0], str) and len(item) == 2:
-            text, gold = item
-            if al_method == "similarity":
-                demo_ids = sampler.select_for_one_test(pool_dataset, text, num_shots)
-                demos = [pool_dataset[i] for i in demo_ids]
-            prompt = build_classification_prompt(demos, text)
-            pred = mu.predict_classification(prompt, label_space)
+    indices = list(range(rank, len(test_dataset), world_size))
+    for start in tqdm(range(0, len(indices), batch_size), desc="Evaluating", unit="batch", disable=rank != 0):
+        batch_ids = indices[start:start + batch_size]
+        items = [test_dataset[i] for i in batch_ids]
+        prompts = []
+        golds = []
+        choices_list = []
+
+        for item in items:
+            if classification:
+                text, gold = item
+                if al_method == "similarity":
+                    demo_ids = sampler.select_for_one_test(pool_dataset, text, num_shots)
+                    demos_batch = [pool_dataset[i] for i in demo_ids]
+                else:
+                    demos_batch = demos
+                prompts.append(build_classification_prompt(demos_batch, text))
+                golds.append(gold)
+            else:
+                question, choices, gold = item
+                if al_method == "similarity":
+                    demo_ids = sampler.select_for_one_test(pool_dataset, question, num_shots)
+                    demos_batch = [pool_dataset[i] for i in demo_ids]
+                else:
+                    demos_batch = demos
+                prompts.append(build_multichoice_prompt(demos_batch, question, choices))
+                choices_list.append(choices)
+                golds.append(gold)
+
+        if classification:
+            preds = mu.predict_classification_batch(prompts, label_space)
         else:
-            question, choices, gold = item
-            if al_method == "similarity":
-                demo_ids = sampler.select_for_one_test(pool_dataset, question, num_shots)
-                demos = [pool_dataset[i] for i in demo_ids]
-            prompt = build_multichoice_prompt(demos, question, choices)
-            pred = mu.predict_multichoice(prompt, choices)
-        results.append({"id": idx, "prediction": pred, "gold": gold, "correct": pred == gold})
+            preds = mu.predict_multichoice_batch(prompts, choices_list)
+
+        for idx, p, g in zip(batch_ids, preds, golds):
+            results.append({"id": idx, "prediction": p, "gold": g, "correct": p == g})
 
     gather_list = [None for _ in range(world_size)]
     dist.all_gather_object(gather_list, results)
@@ -127,12 +152,14 @@ def main() -> None:
     parser.add_argument("--model_name", default=cfg.model_name)
     parser.add_argument("--num_shots", type=int, default=cfg.num_shots)
     parser.add_argument("--perplexity_batch_size", type=int, default=cfg.perplexity_batch_size)
+    parser.add_argument("--inference_batch_size", type=int, default=cfg.inference_batch_size)
     parser.add_argument("--local_rank", type=int, default=None, help="Provided by torchrun")
     args = parser.parse_args()
 
     cfg.perplexity_batch_size = args.perplexity_batch_size
+    cfg.inference_batch_size = args.inference_batch_size
 
-    local_rank = setup_ddp()
+    _ = setup_ddp()
     try:
         run(args.task, args.al_method, args.model_name, args.num_shots)
     finally:
