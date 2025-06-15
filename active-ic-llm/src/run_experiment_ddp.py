@@ -68,7 +68,12 @@ def run(task: str, al_method: str, model_name: str, num_shots: int) -> None:
     label_space = sorted(set(pool_dataset.get_all_labels()))
 
     if al_method != "similarity":
-        demo_indices = sampler.select(pool_dataset, num_shots)
+        demo_indices = None
+        if rank == 0:
+            demo_indices = sampler.select(pool_dataset, num_shots)
+        obj_list = [demo_indices]
+        dist.broadcast_object_list(obj_list, src=0)
+        demo_indices = obj_list[0]
         demos = [pool_dataset[i] for i in demo_indices]
 
     results = []
