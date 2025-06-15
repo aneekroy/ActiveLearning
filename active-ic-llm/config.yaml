@@ -53,3 +53,12 @@ num_gpus: 4
 
 perplexity_batch_size: 8
 
+# Directory used to cache sentence embeddings for the similarity
+# sampler. If embeddings for a dataset are present here, they will be
+# loaded instead of recomputed.
+embedding_cache_dir: embedding_cache
+
+# Number of evaluation examples processed together when querying the
+# model. Adjust this to balance speed and memory usage.
+inference_batch_size: 8
+
