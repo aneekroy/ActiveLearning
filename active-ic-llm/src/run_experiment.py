@@ -68,9 +68,13 @@ def run(task: str, al_method: str, model_name: str, num_shots: int) -> None:
                 golds.append(gold)
 
         if classification:
-            preds = mu.predict_classification_batch(prompts, label_space)
+            preds = mu.predict_classification_batch(
+                prompts, label_space, batch_size=batch_size
+            )
         else:
-            preds = mu.predict_multichoice_batch(prompts, choices_list)
+            preds = mu.predict_multichoice_batch(
+                prompts, choices_list, batch_size=batch_size
+            )
 
         for p, g in zip(preds, golds):
             results.append({"prediction": p, "gold": g, "correct": p == g})

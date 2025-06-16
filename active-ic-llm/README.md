@@ -31,11 +31,14 @@ Run the experiment module from within the `active-ic-llm` directory:
 ```bash
 cd active-ic-llm
 python -m src.run_experiment --task sst2 --al_method random --model_name bert-base-uncased --num_shots 8
-# Optionally control batching for perplexity-based sampling and model inference
+# Optionally control batching for perplexity scoring and prediction
 python -m src.run_experiment --task sst2 --al_method uncertainty \
     --model_name bert-base-uncased --num_shots 8 \
+
     --perplexity_batch_size 16 --inference_batch_size 8
 ```
+The `--inference_batch_size` flag sets how many prompts are scored
+together when predicting labels or multiple choice answers.
 
 Batch experiments for all tasks are available under `experiments/`.
 Outputs including per-example predictions and accuracy/F1 scores are written to the `outputs/` directory. The metrics file for a run can be found at `outputs/<task_type>/<task>/<model>/<al_method>/metrics.json`.
