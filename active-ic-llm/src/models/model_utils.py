@@ -116,20 +116,26 @@ class ModelUtils:
         return scores
 
     def predict_classification_batch(
-        self, prompts: List[str], candidate_labels: List[str]
+        self,
+        prompts: List[str],
+        candidate_labels: List[str],
+        batch_size: int = 1,
     ) -> List[str]:
         """Predict labels for a batch of classification prompts."""
         all_prompts = []
         for p in prompts:
             all_prompts.extend([p + " " + lab for lab in candidate_labels])
 
-        scores = self._score_completion_batch(all_prompts)
+        scores = self._score_completion_batch(all_prompts, batch_size=batch_size)
         scores_tensor = torch.tensor(scores).view(len(prompts), len(candidate_labels))
         best = scores_tensor.argmax(dim=1).tolist()
         return [candidate_labels[i] for i in best]
 
     def predict_multichoice_batch(
-        self, prompts: List[str], choices_list: List[List[str]]
+        self,
+        prompts: List[str],
+        choices_list: List[List[str]],
+        batch_size: int = 1,
     ) -> List[str]:
         """Predict answers for a batch of multiple choice prompts."""
         letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -141,7 +147,7 @@ class ModelUtils:
                 [p + f" {l}) {c}" for l, c in zip(letters, choices)]
             )
 
-        scores = self._score_completion_batch(all_prompts)
+        scores = self._score_completion_batch(all_prompts, batch_size=batch_size)
         preds = []
         idx = 0
         for num_choices in offsets:
